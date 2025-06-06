@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./App.css";
+import html2pdf from "html2pdf.js/dist/html2pdf.bundle";
 
 function App() {
   const [datos, setDatos] = useState({
@@ -10,11 +10,11 @@ function App() {
     idiomas: "",
     certificaciones: "",
     foto: null,
+    plantilla: "clasica"
   });
 
   const handleDatosChange = (e) => {
     const { name, value, type, files } = e.target;
-
     if (type === "file" && files[0]) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -33,66 +33,121 @@ function App() {
       filename: "cv-luciano.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
     };
-
-    if (window.html2pdf && contenido) {
-      window.html2pdf().set(opciones).from(contenido).save();
+    if (contenido) {
+      html2pdf().set(opciones).from(contenido).save();
     } else {
-      alert("La librería de PDF no está disponible aún. Intenta nuevamente en unos segundos.");
+      alert("No se encontró el contenido para generar el PDF.");
     }
   };
 
   return (
-    <div className="App">
-      <h1>Generador de CV</h1>
+    <div
+      className="App"
+      style={{
+        maxWidth: "800px",
+        margin: "0 auto",
+        padding: "20px",
+        fontFamily: "Arial, sans-serif"
+      }}
+    >
+      <h1 style={{ textAlign: "center" }}>Generador de CV</h1>
 
-      <label>
-        Nombre:
-        <input type="text" name="nombre" value={datos.nombre} onChange={handleDatosChange} />
-      </label>
+      <form
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          marginBottom: "30px"
+        }}
+      >
+        <label>
+          Nombre:
+          <input type="text" name="nombre" value={datos.nombre} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Correo electrónico:
-        <input type="email" name="correo" value={datos.correo} onChange={handleDatosChange} />
-      </label>
+        <label>
+          Correo electrónico:
+          <input type="email" name="correo" value={datos.correo} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Redes:
-        <input type="text" name="redes" value={datos.redes} onChange={handleDatosChange} />
-      </label>
+        <label>
+          Redes:
+          <input type="text" name="redes" value={datos.redes} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Habilidades:
-        <input type="text" name="habilidades" value={datos.habilidades} onChange={handleDatosChange} />
-      </label>
+        <label>
+          Habilidades:
+          <input type="text" name="habilidades" value={datos.habilidades} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Idiomas:
-        <input type="text" name="idiomas" value={datos.idiomas} onChange={handleDatosChange} />
-      </label>
+        <label>
+          Idiomas:
+          <input type="text" name="idiomas" value={datos.idiomas} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Certificaciones:
-        <input type="text" name="certificaciones" value={datos.certificaciones} onChange={handleDatosChange} />
-      </label>
+        <label>
+          Certificaciones:
+          <input type="text" name="certificaciones" value={datos.certificaciones} onChange={handleDatosChange} style={{ width: "100%" }} />
+        </label>
 
-      <label>
-        Foto:
-        <input type="file" name="foto" accept="image/*" onChange={handleDatosChange} />
-      </label>
+        <label>
+          Foto:
+          <input type="file" name="foto" accept="image/*" onChange={handleDatosChange} />
+        </label>
 
-      <div id="cv-preview" style={{ marginTop: "20px", border: "1px solid #ccc", padding: "20px" }}>
+        <label>
+          Plantilla:
+          <select name="plantilla" value={datos.plantilla} onChange={handleDatosChange} style={{ width: "100%" }}>
+            <option value="clasica">Clásica</option>
+            <option value="moderna">Moderna</option>
+          </select>
+        </label>
+      </form>
+
+      <div
+        id="cv-preview"
+        style={{
+          border: "1px solid #ccc",
+          padding: "20px",
+          backgroundColor: "#f9f9f9",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+          fontFamily: datos.plantilla === "moderna" ? "Verdana, sans-serif" : "Georgia, serif",
+          background: datos.plantilla === "moderna" ? "#e9f7ff" : "#fffef7"
+        }}
+      >
         <h2>{datos.nombre}</h2>
         <p><strong>Correo:</strong> {datos.correo}</p>
         <p><strong>Redes:</strong> {datos.redes}</p>
         <p><strong>Habilidades:</strong> {datos.habilidades}</p>
         <p><strong>Idiomas:</strong> {datos.idiomas}</p>
         <p><strong>Certificaciones:</strong> {datos.certificaciones}</p>
-        {datos.foto && <img src={datos.foto} alt="Foto" style={{ width: "150px", marginTop: "10px" }} />}
+        {datos.foto && <img src={datos.foto} alt="Foto" style={{ width: "150px", marginTop: "10px", borderRadius: "5px" }} />}
       </div>
 
-      <button onClick={descargarPDF} id="descargar-pdf" style={{ marginTop: "20px" }}>Descargar PDF</button>
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <button
+          onClick={descargarPDF}
+          id="descargar-pdf"
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Descargar PDF
+        </button>
+      </div>
     </div>
   );
 }
