@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import html2pdf from "html2pdf.js/dist/html2pdf.bundle";
+import html2pdf from "html2pdf.js/dist/html2pdf.bundle"; // ✅ Correcto
 
 function App() {
   const [datos, setDatos] = useState({
@@ -35,12 +35,12 @@ function App() {
       html2canvas: { scale: 2 },
       jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
     };
-    if (contenido) {
+  if (contenido) {
+    setTimeout(() => {
       html2pdf().set(opciones).from(contenido).save();
-    } else {
-      alert("No se encontró el contenido para generar el PDF.");
-    }
-  };
+    }, 300); // le damos 300 milisegundos para que cargue la imagen
+  }
+};
 
   return (
     <div
@@ -153,7 +153,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
