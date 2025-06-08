@@ -48,52 +48,60 @@ const MyCV = ({ data, template }) => (
         {data.foto && <Image style={styles.image} src={data.foto} />}
         <Text style={styles.header}>{data.nombre}</Text>
         <Text style={styles.text}>Email: {data.correo}</Text>
-        {data.redesSociales && <Text style={styles.text}>Redes/Portfolio: {data.redesSociales}</Text>}
+        {data.redesSociales && data.redesSociales.trim() !== '' && (
+          <Text style={styles.text}>Redes/Portfolio: {data.redesSociales}</Text>
+        )}
       </View>
 
-      {data.habilidades && data.habilidades.length > 0 && (
+      {data.habilidades && data.habilidades.trim() !== '' && (
         <View style={styles.section}>
           <Text style={styles.subHeader}>Habilidades</Text>
-          {data.habilidades.split(',').map((skill, index) => (
-            <Text key={index} style={styles.listItem}>- {skill.trim()}</Text>
+          {data.habilidades.split('\n').filter(skill => skill.trim() !== '').map((skill, index) => (
+            <Text key={index} style={styles.listItem}>• {skill.trim()}</Text>
           ))}
         </View>
       )}
 
-      {data.idiomas && data.idiomas.length > 0 && (
+      {data.idiomas && data.idiomas.trim() !== '' && (
         <View style={styles.section}>
           <Text style={styles.subHeader}>Idiomas</Text>
-          <Text style={styles.text}>{data.idiomas}</Text>
+          {data.idiomas.split(',').filter(lang => lang.trim() !== '').map((lang, index) => (
+            <Text key={index} style={styles.listItem}>• {lang.trim()}</Text>
+          ))}
         </View>
       )}
 
-      {data.certificaciones && data.certificaciones.length > 0 && (
+      {data.certificaciones && data.certificaciones.trim() !== '' && (
         <View style={styles.section}>
           <Text style={styles.subHeader}>Certificaciones</Text>
-          <Text style={styles.text}>{data.certificaciones}</Text>
+          {data.certificaciones.split(',').filter(cert => cert.trim() !== '').map((cert, index) => (
+            <Text key={index} style={styles.listItem}>• {cert.trim()}</Text>
+          ))}
         </View>
       )}
 
-      {data.formacionAcademica && data.formacionAcademica.length > 0 && (
+      {data.formacionAcademica && data.formacionAcademica.some(f => f.titulo.trim() !== "" || f.institucion.trim() !== "" || f.fecha.trim() !== "") && (
         <View style={styles.section}>
           <Text style={styles.subHeader}>Formación Académica</Text>
-          {data.formacionAcademica.map((item, index) => (
+          {data.formacionAcademica.filter(f => f.titulo.trim() !== "" || f.institucion.trim() !== "" || f.fecha.trim() !== "").map((item, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
-              <Text style={styles.text}>• {item.titulo} en {item.institucion}</Text>
+              <Text style={styles.text}>• **{item.titulo}** en {item.institucion}</Text>
               <Text style={styles.listItem}>{item.fecha}</Text>
             </View>
           ))}
         </View>
       )}
 
-      {data.experienciaLaboral && data.experienciaLaboral.length > 0 && (
+      {data.experienciaLaboral && data.experienciaLaboral.some(e => e.puesto.trim() !== "" || e.empresa.trim() !== "" || e.fecha.trim() !== "" || e.descripcion.trim() !== "") && (
         <View style={styles.section}>
           <Text style={styles.subHeader}>Experiencia Laboral</Text>
-          {data.experienciaLaboral.map((item, index) => (
+          {data.experienciaLaboral.filter(e => e.puesto.trim() !== "" || e.empresa.trim() !== "" || e.fecha.trim() !== "" || e.descripcion.trim() !== "").map((item, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
-              <Text style={styles.text}>• {item.puesto} en {item.empresa}</Text>
+              <Text style={styles.text}>• **{item.puesto}** en {item.empresa}</Text>
               <Text style={styles.listItem}>{item.fecha}</Text>
-              <Text style={styles.listItem}>{item.descripcion}</Text>
+              {item.descripcion && item.descripcion.trim() !== '' && (
+                <Text style={styles.listItem}>{item.descripcion}</Text>
+              )}
             </View>
           ))}
         </View>
@@ -103,3 +111,4 @@ const MyCV = ({ data, template }) => (
 );
 
 export default MyCV;
+// Temporal.

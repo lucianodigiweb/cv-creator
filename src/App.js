@@ -6,14 +6,14 @@ function App() {
   const [datos, setDatos] = useState({
     nombre: "",
     correo: "",
-    redes: "",
+    redesSociales: "",
     habilidades: "",
     idiomas: "",
     certificaciones: "",
     foto: null,
     plantilla: "clasica",
-    formacion: [""],
-    experiencia: [""]
+    formacionAcademica: [{ titulo: "", institucion: "", fecha: "" }],
+    experienciaLaboral: [{ puesto: "", empresa: "", fecha: "", descripcion: "" }]
   });
 
   const handleDatosChange = (e) => {
@@ -29,14 +29,20 @@ function App() {
     }
   };
 
-  const handleListaChange = (tipo, index, value) => {
+  const handleArrayItemChange = (tipo, index, fieldName, value) => {
     const nuevaLista = [...datos[tipo]];
-    nuevaLista[index] = value;
+    nuevaLista[index] = { ...nuevaLista[index], [fieldName]: value };
     setDatos((prev) => ({ ...prev, [tipo]: nuevaLista }));
   };
 
   const agregarCampo = (tipo) => {
-    setDatos((prev) => ({ ...prev, [tipo]: [...prev[tipo], ""] }));
+    if (tipo === "formacionAcademica") {
+      setDatos((prev) => ({ ...prev, [tipo]: [...prev[tipo], { titulo: "", institucion: "", fecha: "" }] }));
+    } else if (tipo === "experienciaLaboral") {
+      setDatos((prev) => ({ ...prev, [tipo]: [...prev[tipo], { puesto: "", empresa: "", fecha: "", descripcion: "" }] }));
+    } else {
+      setDatos((prev) => ({ ...prev, [tipo]: [...prev[tipo], ""] }));
+    }
   };
 
   const eliminarCampo = (tipo, index) => {
@@ -68,7 +74,7 @@ function App() {
         </label>
         <label>
           Redes Sociales/Portfolio:
-          <input type="text" name="redes" value={datos.redes} onChange={handleDatosChange} placeholder="LinkedIn, GitHub, Portfolio URL" />
+          <input type="text" name="redesSociales" value={datos.redesSociales} onChange={handleDatosChange} placeholder="LinkedIn, GitHub, Portfolio URL" />
         </label>
         <label>
           Foto:
@@ -101,42 +107,91 @@ function App() {
         </label>
 
         <h3>Formación Académica</h3>
-        {datos.formacion.map((item, idx) => (
-          <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <textarea
-              value={item}
-              onChange={(e) => handleListaChange("formacion", idx, e.target.value)}
-              placeholder="Ej: Grado en Ingeniería Informática - Universidad X (2015-2019)"
-              rows={3}
-              style={{ flexGrow: 1 }}
-            />
-            {datos.formacion.length > 1 && (
-              <button type="button" onClick={() => eliminarCampo("formacion", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em" }}>
-                &times;
+        {datos.formacionAcademica.map((item, idx) => (
+          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "10px", padding: "10px", border: "1px dashed #ccc", borderRadius: "5px" }}>
+            <label>
+              Título/Grado:
+              <input
+                type="text"
+                value={item.titulo}
+                onChange={(e) => handleArrayItemChange("formacionAcademica", idx, "titulo", e.target.value)}
+                placeholder="Ej: Grado en Ingeniería Informática"
+              />
+            </label>
+            <label>
+              Institución:
+              <input
+                type="text"
+                value={item.institucion}
+                onChange={(e) => handleArrayItemChange("formacionAcademica", idx, "institucion", e.target.value)}
+                placeholder="Ej: Universidad X"
+              />
+            </label>
+            <label>
+              Fechas:
+              <input
+                type="text"
+                value={item.fecha}
+                onChange={(e) => handleArrayItemChange("formacionAcademica", idx, "fecha", e.target.value)}
+                placeholder="Ej: 2015-2019"
+              />
+            </label>
+            {datos.formacionAcademica.length > 1 && (
+              <button type="button" onClick={() => eliminarCampo("formacionAcademica", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em", alignSelf: "flex-end" }}>
+                &times; Eliminar
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={() => agregarCampo("formacion")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Formación</button>
+        <button type="button" onClick={() => agregarCampo("formacionAcademica")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Formación</button>
 
         <h3>Experiencia Laboral</h3>
-        {datos.experiencia.map((item, idx) => (
-          <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <textarea
-              value={item}
-              onChange={(e) => handleListaChange("experiencia", idx, e.target.value)}
-              placeholder="Ej: Desarrollador Frontend - Empresa Y (2020-Presente)"
-              rows={5}
-              style={{ flexGrow: 1 }}
-            />
-            {datos.experiencia.length > 1 && (
-              <button type="button" onClick={() => eliminarCampo("experiencia", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em" }}>
-                &times;
+        {datos.experienciaLaboral.map((item, idx) => (
+          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "10px", padding: "10px", border: "1px dashed #ccc", borderRadius: "5px" }}>
+            <label>
+              Puesto:
+              <input
+                type="text"
+                value={item.puesto}
+                onChange={(e) => handleArrayItemChange("experienciaLaboral", idx, "puesto", e.target.value)}
+                placeholder="Ej: Desarrollador Frontend"
+              />
+            </label>
+            <label>
+              Empresa:
+              <input
+                type="text"
+                value={item.empresa}
+                onChange={(e) => handleArrayItemChange("experienciaLaboral", idx, "empresa", e.target.value)}
+                placeholder="Ej: Empresa Y"
+              />
+            </label>
+            <label>
+              Fechas:
+              <input
+                type="text"
+                value={item.fecha}
+                onChange={(e) => handleArrayItemChange("experienciaLaboral", idx, "fecha", e.target.value)}
+                placeholder="Ej: 2020-Presente"
+              />
+            </label>
+            <label>
+              Descripción (tareas y logros):
+              <textarea
+                value={item.descripcion}
+                onChange={(e) => handleArrayItemChange("experienciaLaboral", idx, "descripcion", e.target.value)}
+                placeholder="Ej: Desarrollo de interfaces de usuario..."
+                rows={3}
+              ></textarea>
+            </label>
+            {datos.experienciaLaboral.length > 1 && (
+              <button type="button" onClick={() => eliminarCampo("experienciaLaboral", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em", alignSelf: "flex-end" }}>
+                &times; Eliminar
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={() => agregarCampo("experiencia")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Experiencia</button>
+        <button type="button" onClick={() => agregarCampo("experienciaLaboral")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Experiencia</button>
       </form>
 
       <div id="cv-preview" style={{
@@ -181,7 +236,7 @@ function App() {
             <strong>Correo:</strong> {datos.correo || "No especificado"}
           </p>
           <p style={{ margin: "0", display: "flex", alignItems: "center", gap: "5px" }}>
-            <strong>Redes:</strong> {datos.redes || "No especificado"}
+            <strong>Redes:</strong> {datos.redesSociales || "No especificado"}
           </p>
         </div>
 
@@ -212,20 +267,29 @@ function App() {
           </div>
         )}
 
-        {datos.formacion.some(f => f.trim() !== "") && (
+        {datos.formacionAcademica.some(f => f.titulo.trim() !== "" || f.institucion.trim() !== "" || f.fecha.trim() !== "") && (
           <div style={{ marginBottom: "15px" }}>
             <h3 style={{ borderBottom: "1px dotted #ccc", paddingBottom: "5px", marginBottom: "10px" }}>Formación Académica</h3>
             <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
-              {datos.formacion.filter(f => f.trim() !== "").map((f, i) => <li key={i} style={{ marginBottom: "10px" }}>{f}</li>)}
+              {datos.formacionAcademica.filter(f => f.titulo.trim() !== "" || f.institucion.trim() !== "" || f.fecha.trim() !== "").map((f, i) => (
+                <li key={i} style={{ marginBottom: "10px" }}>
+                  <strong>{f.titulo}</strong> en {f.institucion} ({f.fecha})
+                </li>
+              ))}
             </ul>
           </div>
         )}
 
-        {datos.experiencia.some(e => e.trim() !== "") && (
+        {datos.experienciaLaboral.some(e => e.puesto.trim() !== "" || e.empresa.trim() !== "" || e.fecha.trim() !== "" || e.descripcion.trim() !== "") && (
           <div style={{ marginBottom: "15px" }}>
             <h3 style={{ borderBottom: "1px dotted #ccc", paddingBottom: "5px", marginBottom: "10px" }}>Experiencia Laboral</h3>
             <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
-              {datos.experiencia.filter(e => e.trim() !== "").map((e, i) => <li key={i} style={{ marginBottom: "10px" }}>{e}</li>)}
+              {datos.experienciaLaboral.filter(e => e.puesto.trim() !== "" || e.empresa.trim() !== "" || e.fecha.trim() !== "" || e.descripcion.trim() !== "").map((e, i) => (
+                <li key={i} style={{ marginBottom: "10px" }}>
+                  <strong>{e.puesto}</strong> en {e.empresa} ({e.fecha})<br />
+                  {e.descripcion}
+                </li>
+              ))}
             </ul>
           </div>
         )}
