@@ -1,0 +1,5 @@
+// config-overrides.js
+module.exports = function override(config, env) {
+  // Agrega aquí tus personalizaciones si las tienes, o déjalo vacío
+  return config;
+};

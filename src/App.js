@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import html2pdf from "html2pdf.js/dist/html2pdf.bundle.js";
+import React, { useState } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import MyCV from './components/MyCV';
 
 function App() {
   const [datos, setDatos] = useState({
@@ -38,20 +39,9 @@ function App() {
     setDatos((prev) => ({ ...prev, [tipo]: [...prev[tipo], ""] }));
   };
 
-  const descargarPDF = () => {
-    const contenido = document.getElementById("cv-preview");
-    const opciones = {
-      margin: [0.2, 0.5, 0.2, 0.5],
-      filename: "mi_cv.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-    if (contenido) {
-      setTimeout(() => {
-        html2pdf().set(opciones).from(contenido).save();
-      }, 500);
-    }
+  const eliminarCampo = (tipo, index) => {
+    const nuevaLista = datos[tipo].filter((_, i) => i !== index);
+    setDatos((prev) => ({ ...prev, [tipo]: nuevaLista }));
   };
 
   return (
@@ -64,88 +54,211 @@ function App() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ textAlign: "center" }}>Generador de CV</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Generador de CV</h1>
 
-      <form style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <label>Nombre:<input type="text" name="nombre" value={datos.nombre} onChange={handleDatosChange} maxLength="100" /></label>
-        <label>Correo electrónico:<input type="email" name="correo" value={datos.correo} onChange={handleDatosChange} maxLength="100" /></label>
-        <label>Redes:<input type="text" name="redes" value={datos.redes} onChange={handleDatosChange} maxLength="200" /></label>
-        <label>Habilidades:<input type="text" name="habilidades" value={datos.habilidades} onChange={handleDatosChange} maxLength="300" /></label>
-        <label>Idiomas:<input type="text" name="idiomas" value={datos.idiomas} onChange={handleDatosChange} maxLength="200" /></label>
-        <label>Certificaciones:<input type="text" name="certificaciones" value={datos.certificaciones} onChange={handleDatosChange} maxLength="200" /></label>
-        <label>Foto:<input type="file" name="foto" accept="image/*" onChange={handleDatosChange} /></label>
-        <label>Plantilla:
+      <form style={{ display: "flex", flexDirection: "column", gap: "15px", marginBottom: "30px", border: "1px solid #eee", padding: "20px", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
+        <h2>Datos Personales</h2>
+        <label>
+          Nombre:
+          <input type="text" name="nombre" value={datos.nombre} onChange={handleDatosChange} placeholder="Tu Nombre Completo" />
+        </label>
+        <label>
+          Correo electrónico:
+          <input type="email" name="correo" value={datos.correo} onChange={handleDatosChange} placeholder="tu.correo@ejemplo.com" />
+        </label>
+        <label>
+          Redes Sociales/Portfolio:
+          <input type="text" name="redes" value={datos.redes} onChange={handleDatosChange} placeholder="LinkedIn, GitHub, Portfolio URL" />
+        </label>
+        <label>
+          Foto:
+          <input type="file" name="foto" accept="image/*" onChange={handleDatosChange} />
+        </label>
+        <label>
+          Plantilla:
           <select name="plantilla" value={datos.plantilla} onChange={handleDatosChange}>
             <option value="clasica">Clásica</option>
             <option value="moderna">Moderna</option>
           </select>
         </label>
 
+        <h2>Habilidades</h2>
+        <label>
+          Habilidades (separadas por comas o saltos de línea):
+          <textarea name="habilidades" value={datos.habilidades} onChange={handleDatosChange} rows="5" placeholder="JavaScript, React, Node.js, Inglés Avanzado..."></textarea>
+        </label>
+
+        <h2>Idiomas</h2>
+        <label>
+          Idiomas:
+          <input type="text" name="idiomas" value={datos.idiomas} onChange={handleDatosChange} placeholder="Español (Nativo), Inglés (Fluido), Alemán (Básico)" />
+        </label>
+
+        <h2>Certificaciones</h2>
+        <label>
+          Certificaciones:
+          <input type="text" name="certificaciones" value={datos.certificaciones} onChange={handleDatosChange} placeholder="Certificación en Scrum Master, Curso de UX/UI" />
+        </label>
+
         <h3>Formación Académica</h3>
         {datos.formacion.map((item, idx) => (
-          <input key={idx} type="text" value={item} onChange={(e) => handleListaChange("formacion", idx, e.target.value)} maxLength="200" />
+          <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <textarea
+              value={item}
+              onChange={(e) => handleListaChange("formacion", idx, e.target.value)}
+              placeholder="Ej: Grado en Ingeniería Informática - Universidad X (2015-2019)"
+              rows={3}
+              style={{ flexGrow: 1 }}
+            />
+            {datos.formacion.length > 1 && (
+              <button type="button" onClick={() => eliminarCampo("formacion", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em" }}>
+                &times;
+              </button>
+            )}
+          </div>
         ))}
-        <button type="button" onClick={() => agregarCampo("formacion")}>+ Añadir Formación</button>
+        <button type="button" onClick={() => agregarCampo("formacion")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Formación</button>
 
         <h3>Experiencia Laboral</h3>
         {datos.experiencia.map((item, idx) => (
-          <input key={idx} type="text" value={item} onChange={(e) => handleListaChange("experiencia", idx, e.target.value)} maxLength="200" />
+          <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <textarea
+              value={item}
+              onChange={(e) => handleListaChange("experiencia", idx, e.target.value)}
+              placeholder="Ej: Desarrollador Frontend - Empresa Y (2020-Presente)"
+              rows={5}
+              style={{ flexGrow: 1 }}
+            />
+            {datos.experiencia.length > 1 && (
+              <button type="button" onClick={() => eliminarCampo("experiencia", idx)} style={{ background: "none", border: "none", color: "red", cursor: "pointer", fontSize: "1.2em" }}>
+                &times;
+              </button>
+            )}
+          </div>
         ))}
-        <button type="button" onClick={() => agregarCampo("experiencia")}>+ Añadir Experiencia</button>
+        <button type="button" onClick={() => agregarCampo("experiencia")} style={{ alignSelf: "flex-start", padding: "8px 15px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Añadir Experiencia</button>
       </form>
 
       <div id="cv-preview" style={{
-        border: "1px solid #ccc",
-        padding: "20px 30px",
+        width: "7.5in",
+        margin: "20px auto",
+        padding: "0.5in",
         backgroundColor: datos.plantilla === "moderna" ? "#e9f7ff" : "#fffef7",
         fontFamily: datos.plantilla === "moderna" ? "Verdana, sans-serif" : "Georgia, serif",
-        marginTop: "10px",
-        minHeight: "800px",
         color: "#000",
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         lineHeight: "1.6",
-        fontSize: "15px"
+        fontSize: "17px",
+        boxSizing: "border-box",
+        minHeight: "1056px",
+        maxHeight: "none",
+        overflow: "hidden",
+        position: "relative",
       }}>
-        <h2 style={{ borderBottom: "1px solid #ccc", paddingBottom: "8px" }}>{datos.nombre}</h2>
-        <p><strong>Correo:</strong> {datos.correo}</p>
-        <p><strong>Redes:</strong> {datos.redes}</p>
-        <p><strong>Habilidades:</strong> {datos.habilidades}</p>
-        <p><strong>Idiomas:</strong> {datos.idiomas}</p>
-        <p><strong>Certificaciones:</strong> {datos.certificaciones}</p>
+        {datos.foto && (
+          <img
+            src={datos.foto}
+            alt="Foto de Perfil"
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              marginBottom: "20px",
+              border: "3px solid #ccc",
+              display: "block",
+              margin: "0 auto 20px auto",
+            }}
+          />
+        )}
 
-        {datos.formacion.length > 0 && (
-          <div>
-            <strong>Formación:</strong>
-            <ul>{datos.formacion.map((f, i) => <li key={i}>{f}</li>)}</ul>
+        <h2 style={{ borderBottom: "1px solid #ccc", paddingBottom: "8px", marginBottom: "15px", textAlign: "center" }}>
+          {datos.nombre || "Tu Nombre"}
+        </h2>
+
+        <div style={{ marginBottom: "15px" }}>
+          <p style={{ margin: "0", display: "flex", alignItems: "center", gap: "5px" }}>
+            <strong>Correo:</strong> {datos.correo || "No especificado"}
+          </p>
+          <p style={{ margin: "0", display: "flex", alignItems: "center", gap: "5px" }}>
+            <strong>Redes:</strong> {datos.redes || "No especificado"}
+          </p>
+        </div>
+
+        {datos.habilidades && (
+          <div style={{ marginBottom: "15px" }}>
+            <strong>Habilidades:</strong>
+            <ul style={{ listStyleType: "disc", marginLeft: "20px", marginTop: "5px" }}>
+              {datos.habilidades.split('\n').filter(skill => skill.trim() !== '').map((skill, i) => <li key={i}>{skill.trim()}</li>)}
+            </ul>
           </div>
         )}
 
-        {datos.experiencia.length > 0 && (
-          <div>
-            <strong>Experiencia:</strong>
-            <ul>{datos.experiencia.map((e, i) => <li key={i}>{e}</li>)}</ul>
+        {datos.idiomas && (
+          <div style={{ marginBottom: "15px" }}>
+            <strong>Idiomas:</strong>
+            <ul style={{ listStyleType: "disc", marginLeft: "20px", marginTop: "5px" }}>
+              {datos.idiomas.split(',').filter(lang => lang.trim() !== '').map((lang, i) => <li key={i}>{lang.trim()}</li>)}
+            </ul>
           </div>
         )}
 
-        {datos.foto && <img src={datos.foto} alt="Foto" style={{ width: "150px", marginTop: "20px", borderRadius: "5px", boxShadow: "0 0 8px rgba(0,0,0,0.1)" }} />}
+        {datos.certificaciones && (
+          <div style={{ marginBottom: "15px" }}>
+            <strong>Certificaciones:</strong>
+            <ul style={{ listStyleType: "disc", marginLeft: "20px", marginTop: "5px" }}>
+              {datos.certificaciones.split(',').filter(cert => cert.trim() !== '').map((cert, i) => <li key={i}>{cert.trim()}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {datos.formacion.some(f => f.trim() !== "") && (
+          <div style={{ marginBottom: "15px" }}>
+            <h3 style={{ borderBottom: "1px dotted #ccc", paddingBottom: "5px", marginBottom: "10px" }}>Formación Académica</h3>
+            <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
+              {datos.formacion.filter(f => f.trim() !== "").map((f, i) => <li key={i} style={{ marginBottom: "10px" }}>{f}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {datos.experiencia.some(e => e.trim() !== "") && (
+          <div style={{ marginBottom: "15px" }}>
+            <h3 style={{ borderBottom: "1px dotted #ccc", paddingBottom: "5px", marginBottom: "10px" }}>Experiencia Laboral</h3>
+            <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
+              {datos.experiencia.filter(e => e.trim() !== "").map((e, i) => <li key={i} style={{ marginBottom: "10px" }}>{e}</li>)}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div style={{ textAlign: "center", marginTop: "30px" }}>
-        <button
-          onClick={descargarPDF}
-          id="descargar-pdf"
-          style={{
-            padding: "12px 25px",
-            fontSize: "16px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer"
-          }}
+        <PDFDownloadLink
+          document={<MyCV data={datos} template={datos.plantilla} />}
+          fileName="mi_cv.pdf"
         >
-          Descargar PDF
-        </button>
+          {({ blob, url, loading, error }) =>
+            loading ? 'Generando PDF...' : (
+              <button
+                type="button"
+                style={{
+                  padding: "12px 25px",
+                  fontSize: "16px",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  transition: "background-color 0.3s ease"
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+              >
+                Descargar CV en PDF
+              </button>
+            )
+          }
+        </PDFDownloadLink>
       </div>
     </div>
   );
