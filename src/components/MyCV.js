@@ -85,7 +85,7 @@ const MyCV = ({ data, template }) => (
           <Text style={styles.subHeader}>Formación Académica</Text>
           {data.formacionAcademica.filter(f => f.titulo.trim() !== "" || f.institucion.trim() !== "" || f.fecha.trim() !== "").map((item, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
-              <Text style={styles.text}>• **{item.titulo}** en {item.institucion}</Text>
+              <Text style={styles.text}>• {item.titulo} en {item.institucion}</Text>
               <Text style={styles.listItem}>{item.fecha}</Text>
             </View>
           ))}
@@ -97,7 +97,7 @@ const MyCV = ({ data, template }) => (
           <Text style={styles.subHeader}>Experiencia Laboral</Text>
           {data.experienciaLaboral.filter(e => e.puesto.trim() !== "" || e.empresa.trim() !== "" || e.fecha.trim() !== "" || e.descripcion.trim() !== "").map((item, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
-              <Text style={styles.text}>• **{item.puesto}** en {item.empresa}</Text>
+              <Text style={styles.text}>• {item.puesto} en {item.empresa}</Text>
               <Text style={styles.listItem}>{item.fecha}</Text>
               {item.descripcion && item.descripcion.trim() !== '' && (
                 <Text style={styles.listItem}>{item.descripcion}</Text>
@@ -111,4 +111,3 @@ const MyCV = ({ data, template }) => (
 );
 
 export default MyCV;
-// Temporal.
